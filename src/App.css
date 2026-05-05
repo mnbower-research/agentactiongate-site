@@ -316,7 +316,8 @@ pre {
 
 .comparison-grid,
 .decision-grid,
-.fit-grid {
+.fit-grid,
+.policy-grid {
   display: grid;
   gap: 1rem;
 }
@@ -328,6 +329,11 @@ pre {
 
 .decision-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.policy-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 1.35rem 0 1.1rem;
 }
 
 .card {
@@ -457,6 +463,63 @@ pre {
   background: rgba(56, 213, 255, 0.045);
   color: #d8dce2;
   font-size: 0.9rem;
+}
+
+.policy-lead {
+  color: #f5f5f5;
+  font-weight: 750;
+}
+
+.policy-card {
+  min-height: 13.25rem;
+}
+
+.policy-card h3 {
+  margin-bottom: 0.7rem;
+}
+
+.policy-card .check-list {
+  margin-top: 0;
+}
+
+.policy-card .check-list li {
+  color: #b6bbc4;
+  font-size: 0.94rem;
+}
+
+.policy-flow-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 0.8fr);
+  gap: 1rem;
+  align-items: stretch;
+  margin-top: 1.15rem;
+}
+
+.policy-flow {
+  max-width: none;
+  margin: 0;
+}
+
+.policy-note {
+  padding: clamp(1rem, 2vw, 1.2rem);
+  border: 1px solid rgba(56, 213, 255, 0.18);
+  border-radius: 0.42rem;
+  background:
+    linear-gradient(180deg, rgba(56, 213, 255, 0.055), rgba(255, 255, 255, 0.012)),
+    #101114;
+}
+
+.policy-note code {
+  display: block;
+  margin-bottom: 0.85rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+
+.policy-note p:last-child {
+  margin-bottom: 0;
+  color: #b6bbc4;
 }
 
 .demo-packet-notes {
@@ -733,6 +796,7 @@ td code {
   .hero,
   .comparison-grid,
   .review-layout,
+  .policy-flow-layout,
   .boundary-layout {
     grid-template-columns: 1fr;
   }
@@ -743,7 +807,8 @@ td code {
   }
 
   .decision-grid,
-  .fit-grid {
+  .fit-grid,
+  .policy-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -776,7 +841,8 @@ td code {
   }
 
   .decision-grid,
-  .fit-grid {
+  .fit-grid,
+  .policy-grid {
     grid-template-columns: 1fr;
   }
 

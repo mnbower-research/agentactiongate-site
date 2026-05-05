@@ -77,6 +77,41 @@ const reviewPacketItems = [
   'safer alternative',
 ]
 
+const policyProfileExamples = [
+  {
+    title: 'Sales agent',
+    items: [
+      'allow drafting outreach',
+      'require approval before sending email',
+      'block private lead exports',
+    ],
+  },
+  {
+    title: 'Support agent',
+    items: [
+      'allow drafting replies',
+      'require approval before refunds or account changes',
+      'block credential access or private exports',
+    ],
+  },
+  {
+    title: 'Coding agent',
+    items: [
+      'allow reading files and running tests',
+      'require approval before modifying source',
+      'block secret access or destructive filesystem actions',
+    ],
+  },
+  {
+    title: 'CI/CD agent',
+    items: [
+      'allow test runs',
+      'require approval before deploy',
+      'block destructive production actions',
+    ],
+  },
+]
+
 function ExternalLink({
   href,
   className,
@@ -139,9 +174,9 @@ function App() {
             <p className="hero-support">
               AI agents are moving from answering questions to taking actions.
               Agent Action Gate checks proposed actions before they affect
-              customers, data, code, money, workflows, or public systems, and
-              v0.6.0 adds Review Packets so approval decisions include context
-              before execution.
+              customers, data, code, money, workflows, or public systems - and
+              v0.7.0 adds Policy Profiles so different workflows can use
+              different action rules.
             </p>
             <div className="cta-row">
               <ExternalLink className="button button-primary" href={links.demo}>
@@ -155,8 +190,8 @@ function App() {
               </ExternalLink>
             </div>
             <p className="proof-line">
-              Open-source TypeScript &middot; 19/19 evals passing &middot; v0.6.0
-              Review Packets live
+              Open-source TypeScript &middot; 19/19 evals passing &middot; v0.7.0
+              Policy Profiles live
             </p>
           </div>
 
@@ -166,9 +201,10 @@ function App() {
               <span>pre_execution_gate.txt</span>
             </div>
             <pre>{`AI proposes action
-→ AAG evaluates
-→ allow / require_approval / revise_action / block
-→ decision logged as an audit-style receipt`}</pre>
+-> AAG evaluates workflow context
+-> Policy Profile defines action rules
+-> allow / require_approval / revise_action / block
+-> decision logged as an audit-style receipt`}</pre>
           </div>
         </section>
 
@@ -189,11 +225,11 @@ function App() {
           <div className="comparison-grid">
             <article className="card comparison-card">
               <p className="card-kicker">Old question</p>
-              <h3>“Is this output correct?”</h3>
+              <h3>"Is this output correct?"</h3>
             </article>
             <article className="card comparison-card accent-card">
               <p className="card-kicker">New question</p>
-              <h3>“Should this action be allowed before it affects the world?”</h3>
+              <h3>"Should this action be allowed before it affects the world?"</h3>
             </article>
           </div>
           <p className="closing-line">
@@ -214,10 +250,10 @@ function App() {
           </p>
           <div className="code-card">
             <pre>{`AI reasons
-→ AI selects action
-→ AI executes
-→ external system changes
-→ human review happens too late`}</pre>
+-> AI selects action
+-> AI executes
+-> external system changes
+-> human review happens too late`}</pre>
           </div>
           <p className="closing-line">
             AAG is built to move oversight before the action, not after the
@@ -310,33 +346,84 @@ Reviewer question: Do you approve sending this exact email to this external cont
           </div>
         </section>
 
+        <section className="section policy-profiles-section">
+          <div className="section-heading">
+            <p className="eyebrow">V0.7.0 FEATURE</p>
+            <h2>Policy Profiles</h2>
+          </div>
+          <p className="lead policy-lead">
+            Same gate. Different workflow rules.
+          </p>
+          <p className="lead">
+            A sales agent, support agent, coding agent, and CI/CD agent should
+            not all share the same action policy.
+          </p>
+          <p className="lead">
+            Policy Profiles let Agent Action Gate apply workflow-specific rules
+            for <code>allow</code>, <code>require_approval</code>,{' '}
+            <code>revise_action</code>, and <code>block</code> decisions.
+          </p>
+          <p className="important-line">
+            Review Packets make approval meaningful. Policy Profiles make the
+            gate adaptable.
+          </p>
+          <div className="policy-grid">
+            {policyProfileExamples.map((profile) => (
+              <article className="card policy-card" key={profile.title}>
+                <h3>{profile.title}</h3>
+                <ul className="check-list">
+                  {profile.items.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </article>
+            ))}
+          </div>
+          <div className="policy-flow-layout">
+            <div className="code-card policy-flow">
+              <pre>{`AI proposes action
+-> Policy Profile defines workflow rules
+-> AAG applies safety precedence
+-> Review Packet shows scope, preview, rollback, and risk
+-> allow / require_approval / revise_action / block
+-> receipt records the decision`}</pre>
+            </div>
+            <aside className="policy-note">
+              <p className="card-kicker">Safety precedence</p>
+              <code>block &gt; require_approval &gt; revise_action &gt; allow</code>
+              <p>
+                Profiles should not silently weaken safety. If detector logic
+                blocks an action, a profile cannot downgrade it to allow.
+              </p>
+            </aside>
+          </div>
+        </section>
+
         <section className="section" id="demo">
           <div className="section-heading">
-            <p className="eyebrow">v0.6.0</p>
+            <p className="eyebrow">v0.7.0</p>
             <h2>Launch Copilot Demo</h2>
           </div>
           <p className="lead">
-            The v0.6.0 terminal demo now prints Review Packets for approval and
-            block decisions.
+            The v0.7.0 terminal demo now runs under the launch-copilot Policy
+            Profile.
           </p>
           <p className="important-line">
             Even the copilot used to help launch Agent Action Gate is governed
             by Agent Action Gate before it can send, publish, delete, or export.
           </p>
           <div className="demo-packet-notes">
-            <p>For example:</p>
+            <p>The profile:</p>
             <ul className="check-list">
+              <li>allows internal preparation</li>
               <li>
-                Send outreach email shows the exact recipient, subject, body,
-                rollback condition, risk reason, and reviewer question.
+                requires approval for external/public communication
               </li>
               <li>
-                Delete lead record shows the record that would be deleted and
-                suggests archiving instead.
+                blocks destructive or sensitive lead-data actions
               </li>
               <li>
-                Export private lead list shows the data exposure scope and
-                suggests a narrowed, redacted export.
+                requires Review Packets for approval and block decisions
               </li>
             </ul>
           </div>
@@ -406,13 +493,15 @@ Reviewer question: Do you approve sending this exact email to this external cont
             AAG creates audit-style evidence around proposed actions.
           </p>
           <p className="lead">
-            Receipts become more useful when they include the review packet
-            context: what was proposed, what was visible to the reviewer, what
+            Receipts become more useful when they record not only the decision,
+            but the policy profile and review packet context that shaped the
+            decision: what was proposed, what was visible to the reviewer, what
             decision was made, and why.
           </p>
           <div className="code-card">
             <pre>{`{
   "agent": "launch-copilot",
+  "policyProfile": "launch-copilot",
   "proposedAction": "send_outreach_email",
   "decision": "require_approval",
   "reason": "External communication requires human review.",
@@ -508,7 +597,7 @@ Reviewer question: Do you approve sending this exact email to this external cont
           <strong>Agent Action Gate</strong>
           <p>
             &copy; 2026 Michael Bower. Agent Action Gate is an open-source
-            reference implementation. v0.6.0 Review Packets live.
+            reference implementation. v0.7.0 Policy Profiles live.
           </p>
         </div>
         <nav aria-label="Footer navigation">
