@@ -67,6 +67,16 @@ const demoRows = [
   ['Export private lead list', 'block'],
 ]
 
+const reviewPacketItems = [
+  'proposed action',
+  'scope',
+  'diff / preview',
+  'rollback path',
+  'risk reason',
+  'reviewer question',
+  'safer alternative',
+]
+
 function ExternalLink({
   href,
   className,
@@ -129,7 +139,9 @@ function App() {
             <p className="hero-support">
               AI agents are moving from answering questions to taking actions.
               Agent Action Gate checks proposed actions before they affect
-              customers, data, code, money, workflows, or public systems.
+              customers, data, code, money, workflows, or public systems, and
+              v0.6.0 adds Review Packets so approval decisions include context
+              before execution.
             </p>
             <div className="cta-row">
               <ExternalLink className="button button-primary" href={links.demo}>
@@ -143,7 +155,8 @@ function App() {
               </ExternalLink>
             </div>
             <p className="proof-line">
-              Open-source TypeScript · 19/19 evals passing · Demo live
+              Open-source TypeScript &middot; 19/19 evals passing &middot; v0.6.0
+              Review Packets live
             </p>
           </div>
 
@@ -231,19 +244,102 @@ function App() {
           </div>
         </section>
 
+        <section className="section review-packets-section">
+          <div className="section-heading">
+            <p className="eyebrow">V0.6.0 FEATURE</p>
+            <h2>Review Packets</h2>
+          </div>
+          <div className="review-layout">
+            <div>
+              <p className="lead">
+                Approval before write is not enough if the reviewer cannot see
+                what is being approved.
+              </p>
+              <p className="important-line">
+                <code>require_approval</code> without context is approval
+                theater.
+              </p>
+              <p className="lead">
+                Review Packets make the action boundary visible before
+                execution by showing the proposed action, scope, diff or
+                preview, rollback path, risk reason, and reviewer question.
+              </p>
+            </div>
+            <div className="code-card review-example">
+              <pre>{`Action: Send outreach email
+Decision: require_approval
+
+Review Packet:
+Proposed action: Send outreach email to founder@example-company.test
+Scope: one external contact; email; externalEffect=true
+Diff / Preview:
+Subject: AI agent oversight for launch workflows
+Body: exact email text visible before send
+Rollback: Cannot unsend after execution. Approval is required before sending.
+Risk: External communication affects reputation and creates business commitment risk.
+Reviewer question: Do you approve sending this exact email to this external contact?`}</pre>
+            </div>
+          </div>
+          <div className="comparison-grid review-comparison-grid">
+            <article className="card comparison-card">
+              <p className="card-kicker">Without context</p>
+              <h3>Approval theater</h3>
+              <p>
+                The system asks a human to approve a vague label like{' '}
+                <code>send_email</code> without showing the actual recipient,
+                message, scope, risk, or rollback condition.
+              </p>
+            </article>
+            <article className="card comparison-card accent-card">
+              <p className="card-kicker">With Review Packets</p>
+              <h3>Meaningful review</h3>
+              <p>
+                The reviewer sees the exact action, the affected system, the
+                preview or diff, the rollback path, the risk reason, and the
+                question they are being asked to decide.
+              </p>
+            </article>
+          </div>
+          <div className="packet-list-wrap">
+            <h3>A Review Packet can include:</h3>
+            <div className="packet-list">
+              {reviewPacketItems.map((item) => (
+                <span key={item}>{item}</span>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section className="section" id="demo">
           <div className="section-heading">
-            <p className="eyebrow">v0.5.0</p>
+            <p className="eyebrow">v0.6.0</p>
             <h2>Launch Copilot Demo</h2>
           </div>
           <p className="lead">
-            The v0.5.0 demo shows a simulated business-development agent
-            governed by Agent Action Gate.
+            The v0.6.0 terminal demo now prints Review Packets for approval and
+            block decisions.
           </p>
           <p className="important-line">
             Even the copilot used to help launch Agent Action Gate is governed
             by Agent Action Gate before it can send, publish, delete, or export.
           </p>
+          <div className="demo-packet-notes">
+            <p>For example:</p>
+            <ul className="check-list">
+              <li>
+                Send outreach email shows the exact recipient, subject, body,
+                rollback condition, risk reason, and reviewer question.
+              </li>
+              <li>
+                Delete lead record shows the record that would be deleted and
+                suggests archiving instead.
+              </li>
+              <li>
+                Export private lead list shows the data exposure scope and
+                suggests a narrowed, redacted export.
+              </li>
+            </ul>
+          </div>
           <div className="video-frame">
             <iframe
               src="https://www.youtube.com/embed/YpEOIQ_v15Q"
@@ -308,6 +404,11 @@ function App() {
           </div>
           <p className="lead">
             AAG creates audit-style evidence around proposed actions.
+          </p>
+          <p className="lead">
+            Receipts become more useful when they include the review packet
+            context: what was proposed, what was visible to the reviewer, what
+            decision was made, and why.
           </p>
           <div className="code-card">
             <pre>{`{
@@ -406,8 +507,8 @@ function App() {
         <div>
           <strong>Agent Action Gate</strong>
           <p>
-            © 2026 Michael Bower. Agent Action Gate is an open-source reference
-            implementation.
+            &copy; 2026 Michael Bower. Agent Action Gate is an open-source
+            reference implementation. v0.6.0 Review Packets live.
           </p>
         </div>
         <nav aria-label="Footer navigation">
