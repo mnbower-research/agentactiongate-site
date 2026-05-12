@@ -13,103 +13,116 @@ const links = {
   email: `mailto:${contactEmail}`,
 }
 
-const decisions = [
+const whyActions = [
+  'sending emails',
+  'updating records',
+  'calling APIs',
+  'triggering workflows',
+  'accessing files',
+  'touching customer data',
+  'deploying code',
+]
+
+const workCards = [
   {
-    name: 'allow',
-    description: 'Low-risk internal actions can proceed.',
-    example: 'Draft a private note or summarize internal context.',
+    title: 'Propose',
+    body: 'An agent submits a structured action request before execution.',
   },
   {
-    name: 'require_approval',
-    description:
-      'Actions that affect people, systems, reputation, money, customer data, code, or public communication are paused for human review.',
-    example: 'Send an email, publish a post, issue a refund, deploy code.',
+    title: 'Evaluate',
+    body: 'AAG checks authority, scope, reversibility, approval needs, risk, and proof.',
   },
   {
-    name: 'revise_action',
-    description:
-      'Actions that are directionally valid but too broad, risky, unclear, or poorly scoped are returned for revision.',
-    example: 'Narrow a data request or rewrite an external message.',
+    title: 'Decide',
+    body: 'AAG returns allow, require_approval, revise_action, or block.',
   },
   {
-    name: 'block',
-    description:
-      'Unsafe, destructive, unauthorized, irreversible, or sensitive actions are stopped.',
-    example: 'Delete production records, export private data, access credentials.',
+    title: 'Record',
+    body: 'AAG writes receipts so the decision path can be reviewed later.',
   },
 ]
 
-const designedFor = [
-  'custom tool-calling agents',
-  'n8n / workflow automation',
-  'internal copilots',
-  'coding agents',
-  'browser or API agents',
-  'support and operations agents',
-  'AI systems that can send, delete, export, deploy, publish, refund, or update records',
+const runtimeBehaviors = [
+  'missing permit -> denied',
+  'expired permit -> denied',
+  'wrong action hash -> denied',
+  'non-allow decision -> no permit issued',
+  'valid permit -> simulated execution allowed',
 ]
 
-const boundaryReviewItems = [
-  'what actions the agent can take',
-  'what should be allowed',
-  'what should require approval',
-  'what should be revised',
-  'what should be blocked',
-  'what receipts should be logged',
+const questions = [
+  'Is this action authorized?',
+  'Is it within scope?',
+  'Is it reversible?',
+  'Who is accountable?',
+  'Does it require human judgment?',
+  'What proof remains?',
 ]
 
-const demoRows = [
-  ['Draft outreach email', 'allow'],
-  ['Send outreach email', 'require_approval'],
-  ['Update lead notes', 'allow'],
-  ['Publish LinkedIn post', 'require_approval'],
-  ['Delete lead record', 'block'],
-  ['Export private lead list', 'block'],
+const capabilities = [
+  'pre-execution action evaluation',
+  'four decision outcomes',
+  'policy profiles',
+  'approval authority map',
+  'approval quality layer',
+  'review packets',
+  'workflow scope ledger',
+  'receipt hash chain',
+  'signed receipts MVP',
+  'MetaGate',
+  'Runtime Binding MVP',
+  'n8n demo workflows',
+  'quickstart and integration docs',
 ]
 
-const reviewPacketItems = [
-  'proposed action',
-  'scope',
-  'diff / preview',
-  'rollback path',
-  'risk reason',
-  'reviewer question',
-  'safer alternative',
+const securityStack = [
+  'IAM',
+  'sandboxing',
+  'least-privilege credentials',
+  'runtime separation',
+  'protected key management',
+  'external append-only storage',
+  'legal compliance review',
+  'production security architecture',
 ]
 
-const policyProfileExamples = [
+const releaseProgression = [
   {
-    title: 'Sales agent',
-    items: [
-      'allow drafting outreach',
-      'require approval before sending email',
-      'block private lead exports',
-    ],
+    version: 'v1.0.0',
+    title: 'Core gate',
+    body: 'Evaluate proposed actions before execution.',
   },
   {
-    title: 'Support agent',
-    items: [
-      'allow drafting replies',
-      'require approval before refunds or account changes',
-      'block credential access or private exports',
-    ],
+    version: 'v1.8.0',
+    title: 'Approval Quality Layer',
+    body: 'Improve meaningful human review.',
   },
   {
-    title: 'Coding agent',
-    items: [
-      'allow reading files and running tests',
-      'require approval before modifying source',
-      'block secret access or destructive filesystem actions',
-    ],
+    version: 'v1.9.0',
+    title: 'Signed Receipts MVP',
+    body: 'Local Ed25519 receipt signing and verification.',
   },
   {
-    title: 'CI/CD agent',
-    items: [
-      'allow test runs',
-      'require approval before deploy',
-      'block destructive production actions',
-    ],
+    version: 'v1.9.1',
+    title: 'Adoption polish',
+    body: 'Quickstart, Integration Guide, and Production Hardening docs.',
   },
+  {
+    version: 'v2.0.0',
+    title: 'Runtime Binding MVP',
+    body: 'Execution permits and protected executor simulation.',
+  },
+]
+
+const architectureSteps = [
+  'Agent',
+  'Action Proposal',
+  'Agent Action Gate',
+  'Decision: allow / approval / revise / block',
+  'Receipt',
+  'Execution Permit',
+  'Protected Executor',
+  'Tool Action',
 ]
 
 function ExternalLink({
@@ -122,16 +135,35 @@ function ExternalLink({
   children: React.ReactNode
 }) {
   const isMailto = href.startsWith('mailto:')
+  const isHash = href.startsWith('#')
 
   return (
     <a
       className={className}
       href={href}
-      target={isMailto ? undefined : '_blank'}
-      rel={isMailto ? undefined : 'noreferrer'}
+      target={isMailto || isHash ? undefined : '_blank'}
+      rel={isMailto || isHash ? undefined : 'noreferrer'}
     >
       {children}
     </a>
+  )
+}
+
+function SectionIntro({
+  eyebrow,
+  title,
+  children,
+}: {
+  eyebrow?: string
+  title: string
+  children?: React.ReactNode
+}) {
+  return (
+    <div className="section-intro">
+      {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
+      <h2>{title}</h2>
+      {children}
+    </div>
   )
 }
 
@@ -153,459 +185,278 @@ function App() {
       <header className="top-nav">
         <a className="brand" href="#top" aria-label="Agent Action Gate home">
           <span className="brand-mark" aria-hidden="true" />
-          Agent Action Gate
+          <span>Agent Action Gate</span>
         </a>
         <nav aria-label="Primary navigation">
-          <a href="#demo">Demo</a>
+          <a href="#runtime-binding">Runtime Binding</a>
+          <a href="#quickstart">Quickstart</a>
+          <a href="#hardening">Hardening</a>
           <ExternalLink href={links.github}>GitHub</ExternalLink>
-          <ExternalLink href={links.boundaryReview}>Boundary Review</ExternalLink>
-          <ExternalLink href={links.research}>Research</ExternalLink>
         </nav>
       </header>
 
       <main id="top">
         <section className="hero section">
           <div className="hero-copy">
-            <p className="eyebrow">Open-source action governance layer</p>
-            <h1>Agent Action Gate</h1>
+            <p className="eyebrow">v2.0.0 Runtime Binding MVP</p>
+            <h1>Pre-execution governance for AI agents.</h1>
             <p className="subheadline">
-              Pre-execution action governance for AI agents.
+              Agent Action Gate evaluates proposed agent actions before they
+              touch tools, data, customers, systems, or workflows.
             </p>
-            <p className="hero-support">
-              AI agents are moving from answering questions to taking actions.
-              Agent Action Gate checks proposed actions before they affect
-              customers, data, code, money, workflows, or public systems - and
-              v0.7.0 adds Policy Profiles so different workflows can use
-              different action rules.
-            </p>
-            <div className="cta-row">
-              <ExternalLink className="button button-primary" href={links.demo}>
-                Watch Demo
+            <p className="hero-support">Action must not outrun discernment.</p>
+            <div className="cta-row" aria-label="Primary calls to action">
+              <ExternalLink className="button button-primary" href={links.github}>
+                GitHub
               </ExternalLink>
-              <ExternalLink
-                className="button button-secondary"
-                href={links.github}
-              >
-                View GitHub
-              </ExternalLink>
+              <a className="button button-secondary" href="#quickstart">
+                Quickstart
+              </a>
+              <a className="button button-secondary" href="#runtime-binding">
+                Runtime Binding
+              </a>
             </div>
-            <p className="proof-line">
-              Open-source TypeScript &middot; 19/19 evals passing &middot; v0.7.0
-              Policy Profiles live
-            </p>
           </div>
 
           <div className="hero-panel" aria-label="Agent Action Gate flow">
             <div className="panel-header">
-              <span className="status-dot" />
-              <span>pre_execution_gate.txt</span>
+              <span className="status-dot" aria-hidden="true" />
+              <span>aag-runtime-binding.flow</span>
             </div>
-            <pre>{`AI proposes action
--> AAG evaluates workflow context
--> Policy Profile defines action rules
+            <pre>{`Agent proposes action
+-> AAG evaluates
 -> allow / require_approval / revise_action / block
--> decision logged as an audit-style receipt`}</pre>
+-> receipt is written
+-> execution permit can be issued
+-> protected executor verifies permit`}</pre>
           </div>
         </section>
 
-        <section className="section">
-          <div className="section-heading">
-            <p className="eyebrow">Operational AI</p>
-            <h2>Why now</h2>
-          </div>
-          <div className="copy-block">
+        <section className="section why-section">
+          <SectionIntro eyebrow="Why this exists" title="Agentic AI changes the governance question.">
             <p>
-              AI systems are becoming operational actors. They no longer only
-              generate text; they can trigger tools, workflows, APIs, emails,
-              code changes, database updates, file operations, and public
-              communications.
+              Most AI governance is still built around outputs. But agentic AI
+              is moving from answers to actions.
             </p>
-            <p>That changes the safety question.</p>
-          </div>
-          <div className="comparison-grid">
-            <article className="card comparison-card">
-              <p className="card-kicker">Old question</p>
-              <h3>"Is this output correct?"</h3>
-            </article>
-            <article className="card comparison-card accent-card">
-              <p className="card-kicker">New question</p>
-              <h3>"Should this action be allowed before it affects the world?"</h3>
-            </article>
-          </div>
-          <p className="closing-line">
-            Agent Action Gate focuses on the action boundary: the moment AI
-            cognition becomes external consequence.
-          </p>
-        </section>
-
-        <section className="section">
-          <div className="section-heading">
-            <p className="eyebrow">Failure mode</p>
-            <h2>Integration Bypass</h2>
-          </div>
-          <p className="lead">
-            Integration Bypass occurs when an AI agent closes an action loop
-            before a human has meaningfully understood, reviewed, approved,
-            revised, or owned the outcome.
-          </p>
-          <div className="code-card">
-            <pre>{`AI reasons
--> AI selects action
--> AI executes
--> external system changes
--> human review happens too late`}</pre>
-          </div>
-          <p className="closing-line">
-            AAG is built to move oversight before the action, not after the
-            incident.
-          </p>
-        </section>
-
-        <section className="section">
-          <div className="section-heading">
-            <p className="eyebrow">Decision surface</p>
-            <h2>What Agent Action Gate does</h2>
-          </div>
-          <div className="decision-grid">
-            {decisions.map((decision) => (
-              <article className="card decision-card" key={decision.name}>
-                <h3>{decision.name}</h3>
-                <p>{decision.description}</p>
-                <div className="example">
-                  <span>Example</span>
-                  {decision.example}
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="section review-packets-section">
-          <div className="section-heading">
-            <p className="eyebrow">V0.6.0 FEATURE</p>
-            <h2>Review Packets</h2>
-          </div>
-          <div className="review-layout">
-            <div>
-              <p className="lead">
-                Approval before write is not enough if the reviewer cannot see
-                what is being approved.
-              </p>
-              <p className="important-line">
-                <code>require_approval</code> without context is approval
-                theater.
-              </p>
-              <p className="lead">
-                Review Packets make the action boundary visible before
-                execution by showing the proposed action, scope, diff or
-                preview, rollback path, risk reason, and reviewer question.
-              </p>
-            </div>
-            <div className="code-card review-example">
-              <pre>{`Action: Send outreach email
-Decision: require_approval
-
-Review Packet:
-Proposed action: Send outreach email to founder@example-company.test
-Scope: one external contact; email; externalEffect=true
-Diff / Preview:
-Subject: AI agent oversight for launch workflows
-Body: exact email text visible before send
-Rollback: Cannot unsend after execution. Approval is required before sending.
-Risk: External communication affects reputation and creates business commitment risk.
-Reviewer question: Do you approve sending this exact email to this external contact?`}</pre>
-            </div>
-          </div>
-          <div className="comparison-grid review-comparison-grid">
-            <article className="card comparison-card">
-              <p className="card-kicker">Without context</p>
-              <h3>Approval theater</h3>
-              <p>
-                The system asks a human to approve a vague label like{' '}
-                <code>send_email</code> without showing the actual recipient,
-                message, scope, risk, or rollback condition.
-              </p>
-            </article>
-            <article className="card comparison-card accent-card">
-              <p className="card-kicker">With Review Packets</p>
-              <h3>Meaningful review</h3>
-              <p>
-                The reviewer sees the exact action, the affected system, the
-                preview or diff, the rollback path, the risk reason, and the
-                question they are being asked to decide.
-              </p>
-            </article>
-          </div>
-          <div className="packet-list-wrap">
-            <h3>A Review Packet can include:</h3>
-            <div className="packet-list">
-              {reviewPacketItems.map((item) => (
+          </SectionIntro>
+          <div className="split-layout">
+            <div className="action-list" aria-label="Agent action examples">
+              {whyActions.map((item) => (
                 <span key={item}>{item}</span>
               ))}
             </div>
+            <div className="question-panel">
+              <div>
+                <p className="label">For chatbots</p>
+                <h3>"Is this output correct?"</h3>
+              </div>
+              <div>
+                <p className="label">For agents</p>
+                <h3>"Should this action be allowed before it affects the world?"</h3>
+              </div>
+              <p>
+                That is the gap AAG is built around: the decision point between
+                agent intent and external consequence.
+              </p>
+            </div>
           </div>
         </section>
 
-        <section className="section policy-profiles-section">
-          <div className="section-heading">
-            <p className="eyebrow">V0.7.0 FEATURE</p>
-            <h2>Policy Profiles</h2>
-          </div>
-          <p className="lead policy-lead">
-            Same gate. Different workflow rules.
-          </p>
-          <p className="lead">
-            A sales agent, support agent, coding agent, and CI/CD agent should
-            not all share the same action policy.
-          </p>
-          <p className="lead">
-            Policy Profiles let Agent Action Gate apply workflow-specific rules
-            for <code>allow</code>, <code>require_approval</code>,{' '}
-            <code>revise_action</code>, and <code>block</code> decisions.
-          </p>
-          <p className="important-line">
-            Review Packets make approval meaningful. Policy Profiles make the
-            gate adaptable.
-          </p>
-          <div className="policy-grid">
-            {policyProfileExamples.map((profile) => (
-              <article className="card policy-card" key={profile.title}>
-                <h3>{profile.title}</h3>
-                <ul className="check-list">
-                  {profile.items.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
+        <section className="section">
+          <SectionIntro eyebrow="How AAG works" title="A small gate before action." />
+          <div className="card-grid four">
+            {workCards.map((card) => (
+              <article className="card step-card" key={card.title}>
+                <span className="step-number" aria-hidden="true">
+                  {String(workCards.indexOf(card) + 1).padStart(2, '0')}
+                </span>
+                <h3>{card.title}</h3>
+                <p>{card.body}</p>
               </article>
             ))}
           </div>
-          <div className="policy-flow-layout">
-            <div className="code-card policy-flow">
-              <pre>{`AI proposes action
--> Policy Profile defines workflow rules
--> AAG applies safety precedence
--> Review Packet shows scope, preview, rollback, and risk
--> allow / require_approval / revise_action / block
--> receipt records the decision`}</pre>
+        </section>
+
+        <section className="section runtime-section" id="runtime-binding">
+          <SectionIntro eyebrow="Current release" title="v2.0.0 Runtime Binding MVP">
+            <p className="invariant">
+              No tool execution without a valid AAG execution permit.
+            </p>
+            <p>
+              Runtime Binding connects the gate decision to the execution path.
+              Instead of only recording that the gate evaluated an action, the
+              protected executor checks for a valid permit before simulated
+              execution.
+            </p>
+          </SectionIntro>
+          <div className="runtime-layout">
+            <div className="code-card">
+              <pre>{`Agent proposes action
+-> AAG evaluates action
+-> receipt is written
+-> execution permit can be issued for allow decisions
+-> protected executor verifies permit
+-> no valid permit, no simulated execution`}</pre>
             </div>
-            <aside className="policy-note">
-              <p className="card-kicker">Safety precedence</p>
-              <code>block &gt; require_approval &gt; revise_action &gt; allow</code>
-              <p>
-                Profiles should not silently weaken safety. If detector logic
-                blocks an action, a profile cannot downgrade it to allow.
-              </p>
-            </aside>
-          </div>
-        </section>
-
-        <section className="section" id="demo">
-          <div className="section-heading">
-            <p className="eyebrow">v0.7.0</p>
-            <h2>Launch Copilot Demo</h2>
-          </div>
-          <p className="lead">
-            The v0.7.0 terminal demo now runs under the launch-copilot Policy
-            Profile.
-          </p>
-          <p className="important-line">
-            Even the copilot used to help launch Agent Action Gate is governed
-            by Agent Action Gate before it can send, publish, delete, or export.
-          </p>
-          <div className="demo-packet-notes">
-            <p>The profile:</p>
-            <ul className="check-list">
-              <li>allows internal preparation</li>
-              <li>
-                requires approval for external/public communication
-              </li>
-              <li>
-                blocks destructive or sensitive lead-data actions
-              </li>
-              <li>
-                requires Review Packets for approval and block decisions
-              </li>
-            </ul>
-          </div>
-          <div className="video-frame">
-            <iframe
-              src="https://www.youtube.com/embed/YpEOIQ_v15Q"
-              title="Agent Action Gate Launch Copilot demo"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerPolicy="strict-origin-when-cross-origin"
-              allowFullScreen
-            />
-          </div>
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Proposed action</th>
-                  <th>Gate decision</th>
-                </tr>
-              </thead>
-              <tbody>
-                {demoRows.map(([action, decision]) => (
-                  <tr key={action}>
-                    <td>{action}</td>
-                    <td>
-                      <code>{decision}</code>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <ExternalLink className="button button-secondary" href={links.demoCode}>
-            View demo code on GitHub
-          </ExternalLink>
-        </section>
-
-        <section className="section">
-          <div className="section-heading">
-            <p className="eyebrow">Architecture boundary</p>
-            <h2>Where AAG fits</h2>
-          </div>
-          <p className="lead">
-            Agent Action Gate is designed to sit at the boundary between an AI
-            agent and the tools it wants to use.
-          </p>
-          <div className="fit-grid">
-            {designedFor.map((item) => (
-              <div className="fit-item" key={item}>
-                {item}
-              </div>
-            ))}
-          </div>
-          <p className="constraint-note">
-            AAG is not a replacement for IAM, sandboxing, secrets management,
-            legal review, or organizational governance. It is a pre-execution
-            action gate that can sit alongside those controls.
-          </p>
-        </section>
-
-        <section className="section">
-          <div className="section-heading">
-            <p className="eyebrow">Reviewable evidence</p>
-            <h2>Receipts before consequences</h2>
-          </div>
-          <p className="lead">
-            AAG creates audit-style evidence around proposed actions.
-          </p>
-          <p className="lead">
-            Receipts become more useful when they record not only the decision,
-            but the policy profile and review packet context that shaped the
-            decision: what was proposed, what was visible to the reviewer, what
-            decision was made, and why.
-          </p>
-          <div className="code-card">
-            <pre>{`{
-  "agent": "launch-copilot",
-  "policyProfile": "launch-copilot",
-  "proposedAction": "send_outreach_email",
-  "decision": "require_approval",
-  "reason": "External communication requires human review.",
-  "humanDecision": "approved",
-  "timestamp": "2026-05-04T00:00:00.000Z"
-}`}</pre>
-          </div>
-          <p className="closing-line">
-            The goal is not just to stop unsafe actions. The goal is to make the
-            action boundary visible, reviewable, and accountable.
-          </p>
-        </section>
-
-        <section className="section boundary-section">
-          <div className="section-heading">
-            <p className="eyebrow">Early offering</p>
-            <h2>AI Agent Boundary Review</h2>
-          </div>
-          <div className="boundary-layout">
-            <div>
-              <p className="lead">
-                For teams experimenting with AI agents or automation, the first
-                step is not a full platform rollout. It is a boundary review.
-              </p>
-              <p>An AI Agent Boundary Review maps one workflow and identifies:</p>
+            <div className="card behavior-card">
+              <h3>Demo behavior</h3>
               <ul className="check-list">
-                {boundaryReviewItems.map((item) => (
+                {runtimeBehaviors.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
             </div>
-            <div className="cta-panel">
-              <h3>Map one workflow before it acts.</h3>
-              <p>
-                Define the allow, approval, revision, block, and receipt rules
-                around a real agentic workflow.
-              </p>
-              <div className="stacked-actions">
-                <ExternalLink
-                  className="button button-primary"
-                  href={links.boundaryReview}
-                >
-                  Request Boundary Review
-                </ExternalLink>
-                <ExternalLink
-                  className="button button-secondary"
-                  href={links.github}
-                >
-                  View open-source repo
-                </ExternalLink>
+          </div>
+          <p className="boundary-note">
+            This is an MVP reference implementation, not production-complete
+            enforcement.
+          </p>
+        </section>
+
+        <section className="section">
+          <SectionIntro title="The six questions AAG asks before action." />
+          <ol className="question-grid">
+            {questions.map((question) => (
+              <li className="question-card" key={question}>
+                <span>{String(questions.indexOf(question) + 1).padStart(2, '0')}</span>
+                {question}
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section className="section">
+          <SectionIntro eyebrow="Current capabilities" title="What AAG includes today" />
+          <div className="check-grid">
+            {capabilities.map((item) => (
+              <div className="check-item" key={item}>
+                {item}
               </div>
-              <div className="contact-row">
-                <p>
-                  <span>Email:</span> {contactEmail}
-                </p>
-                <button
-                  className="copy-email-button"
-                  type="button"
-                  onClick={handleCopyEmail}
-                >
-                  {copyEmailLabel}
-                </button>
+            ))}
+          </div>
+        </section>
+
+        <section className="section architecture-section">
+          <SectionIntro eyebrow="Architecture" title="Where the gate sits">
+            <p>
+              AAG sits between an AI agent and the tool action it wants to run.
+              It evaluates proposed actions before execution and leaves evidence
+              of the decision path.
+            </p>
+          </SectionIntro>
+          <div className="architecture-diagram" aria-label="Agent Action Gate architecture flow">
+            {architectureSteps.map((step) => (
+              <div className="diagram-step" key={step}>
+                <span>{step}</span>
               </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="section hardening-section" id="hardening">
+          <SectionIntro title="AAG is a gate, not the whole security stack.">
+            <p>AAG does not replace:</p>
+          </SectionIntro>
+          <div className="security-list">
+            {securityStack.map((item) => (
+              <span key={item}>{item}</span>
+            ))}
+          </div>
+          <p className="closing-line">
+            AAG adds the missing pre-execution decision and proof layer between
+            agent intent and real-world consequence.
+          </p>
+        </section>
+
+        <section className="section quickstart-section" id="quickstart">
+          <SectionIntro eyebrow="Developer quickstart" title="Run the gate locally">
+            <p>
+              Start from the open-source package and demo commands, then review
+              the Runtime Binding MVP and production hardening boundaries before
+              connecting real tools.
+            </p>
+          </SectionIntro>
+          <div className="quickstart-layout">
+            <div className="code-card">
+              <pre>{`npm install agent-action-gate
+
+npm run eval:action-gate
+npm run demo:runtime-binding
+npm run test:runtime-binding`}</pre>
+            </div>
+            <div className="doc-links" aria-label="Documentation links">
+              <ExternalLink href={links.github}>GitHub repo</ExternalLink>
+              <a href="#quickstart">Quickstart docs</a>
+              <a href="#runtime-binding">Runtime Binding docs</a>
+              <a href="#hardening">Production Hardening docs</a>
             </div>
           </div>
         </section>
 
         <section className="section">
-          <div className="section-heading">
-            <p className="eyebrow">Research foundation</p>
-            <h2>Research foundation</h2>
+          <SectionIntro eyebrow="Release progression" title="From evaluation to runtime binding" />
+          <div className="timeline">
+            {releaseProgression.map((release) => (
+              <article className="timeline-item" key={release.version}>
+                <span>{release.version}</span>
+                <h3>{release.title}</h3>
+                <p>{release.body}</p>
+              </article>
+            ))}
           </div>
-          <p className="lead">
-            Agent Action Gate is part of a broader research program called
-            Alignment Theory, focused on human agency, participatory capacity,
-            internal vs. external regulation, and the conditions under which
-            systems preserve or erode meaningful human judgment.
-          </p>
-          <div className="research-list" aria-label="Research themes">
-            <span>Integration Bypass</span>
-            <span>PCPI: Participatory Capacity Preservation Index</span>
-            <span>Pre-execution human oversight</span>
-            <span>Runtime action governance</span>
+        </section>
+
+        <section className="section evaluator-section">
+          <SectionIntro eyebrow="Early evaluation" title="Map one workflow before it acts.">
+            <p>
+              For technical builders, governance teams, and early enterprise
+              evaluators, the useful first step is a bounded workflow review:
+              what the agent may do, what requires approval, what must be
+              revised, what must be blocked, and what proof should remain.
+            </p>
+          </SectionIntro>
+          <div className="cta-panel">
+            <div>
+              <h3>AI Agent Boundary Review</h3>
+              <p>
+                Define the allow, approval, revision, block, and receipt rules
+                around a real agentic workflow.
+              </p>
+            </div>
+            <div className="cta-actions">
+              <ExternalLink className="button button-primary" href={links.boundaryReview}>
+                Request Boundary Review
+              </ExternalLink>
+              <ExternalLink className="button button-secondary" href={links.github}>
+                View GitHub
+              </ExternalLink>
+            </div>
           </div>
-          <ExternalLink className="button button-secondary" href={links.research}>
-            Explore Alignment Theory
-          </ExternalLink>
         </section>
       </main>
 
       <footer className="site-footer">
         <div>
           <strong>Agent Action Gate</strong>
-          <p>
-            &copy; 2026 Michael Bower. Agent Action Gate is an open-source
-            reference implementation. v0.7.0 Policy Profiles live.
+          <p>Open-source pre-execution governance layer for AI agents.</p>
+          <p className="footer-provenance">
+            Copyright 2026 Michael Bower. Agent Action Gate is an open-source
+            MVP reference implementation.
           </p>
+          <p className="footer-motto">Action must not outrun discernment.</p>
         </div>
         <nav aria-label="Footer navigation">
           <ExternalLink href={links.github}>GitHub</ExternalLink>
-          <ExternalLink href={links.demo}>Demo</ExternalLink>
-          <ExternalLink href={links.research}>Alignment Theory</ExternalLink>
+          <a href="#quickstart">Quickstart</a>
+          <a href="#runtime-binding">Runtime Binding</a>
+          <a href="#hardening">Production Hardening</a>
+          <ExternalLink href={links.demo}>Demo archive</ExternalLink>
+          <ExternalLink href={links.research}>Research</ExternalLink>
           <ExternalLink href={links.email}>{contactEmail}</ExternalLink>
         </nav>
+        <button className="copy-email-button" type="button" onClick={handleCopyEmail}>
+          {copyEmailLabel}
+        </button>
       </footer>
     </div>
   )
